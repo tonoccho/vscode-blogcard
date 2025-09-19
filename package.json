@@ -1,0 +1,64 @@
+{
+  "name": "vscode-blogcard",
+  "displayName": "Blogcard Generator",
+  "description": "This extension generates blog card from selected test (URL / Entire HTML) in editor screen.",
+  "repository": {"url": "https://github.com/tonoccho/vscode-blogcard.git"},
+  "license":"MIT",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.104.0"
+  },
+  "categories": [
+    "Plugins"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "configuration": {
+      "title": "%title%",
+      "properties": {
+        "vscode-blogcard.createBlogCard": {
+          "type": "string",
+          "default": "",
+          "description": "%description%"
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "vscode.contextmenu.createBlogCard",
+        "title": "Create blog card from selected text"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "when": "editorFocus",
+          "command": "vscode.contextmenu.createBlogCard",
+          "group": "myGroup@1"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "pretest": "npm run lint",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "22.x",
+    "@types/vscode": "^1.104.0",
+    "@vscode/test-cli": "^0.0.11",
+    "@vscode/test-electron": "^2.5.2",
+    "eslint": "^9.34.0"
+  },
+  "dependencies": {
+    "axios": "^1.12.2",
+    "jsdom": "^27.0.0",
+    "node-fetch": "^3.3.2",
+    "request": "^2.88.2"
+  }
+}
