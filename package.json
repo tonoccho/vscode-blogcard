@@ -18,12 +18,18 @@
   "contributes": {
     "configuration": {
       "title": "%title%",
-      "properties": {
-        "vscode-blogcard.createBlogCard": {
+      "properties": {        
+        "blogcard.templateWithoutImage": {
           "type": "string",
           "default": "",
-          "description": "%description%"
+          "description": "ブログカードのHTMLテンプレート（画像無し）を設定してください"
+        },
+        "blogcard.templateWithImage": {
+          "type": "string",
+          "default": "",
+          "description": "ブログカードのHTMLテンプレート（画像あり）を設定してください"
         }
+
       }
     },
     "commands": [

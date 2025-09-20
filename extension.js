@@ -48,11 +48,20 @@ function getContent(url, activeEditor, ref) {
 		const bcSiteName = getSiteName(dom, url);
 		const bcImage = getImage(dom);
 		var replaceStr = '';
+		const config = vscode.workspace.getConfiguration('blogcard');
+		
 		if(bcImage == null || bcImage =='') {
-			replaceStr = "" // type html by yourself
+			replaceStr = config.get('templateWithoutImage');
 		} else {
-			replaceStr = "" // type html by yourself
+			replaceStr = config.get('templateWithImage');
 		}
+
+		replaceStr = replaceStr.replaceAll("${bcUrl}", bcUrl);
+        replaceStr = replaceStr.replaceAll("${bcType}", bcType);
+        replaceStr = replaceStr.replaceAll("${bcTitle}", bcTitle);
+        replaceStr = replaceStr.replaceAll("${bcDescription}", bcDescription);
+        replaceStr = replaceStr.replaceAll("${bcSiteName}", bcSiteName);
+        replaceStr = replaceStr.replaceAll("${bcImage}", bcImage);
 
         activeEditor.edit((edit) => {
 		      	edit.replace(ref, replaceStr);
