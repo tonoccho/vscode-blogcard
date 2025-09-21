@@ -18,7 +18,7 @@
   "contributes": {
     "configuration": {
       "title": "%title%",
-      "properties": {        
+      "properties": {
         "blogcard.templateWithoutImage": {
           "type": "string",
           "default": "<div class='blog-card'><h3><a href='${bcUrl}' target='_blank'>${bcTitle} | ${bcSiteName}</a><h3><p>${bcDescription}</p></div>",
@@ -28,8 +28,22 @@
           "type": "string",
           "default": "<div class='blog-card'><h3><a href='${bcUrl}' target='_blank'>${bcTitle} | ${bcSiteName}</a><h3><p>${bcDescription}</p></div>",
           "description": "ブログカードのHTMLテンプレート（画像あり）を設定してください"
+        },
+        "blogcard.amazonAccessKey": {
+          "type": "string",
+          "default": "",
+          "description": "amazonアソシエイトAPIのアクセスキーを設定してください"
+        },
+        "blogcard.amazonSecretKey": {
+          "type": "string",
+          "default": "",
+          "description": "amazonアソシエイトAPIのシークレットキーを設定してください"
+        },
+        "blogcard.amazonTrackingID": {
+          "type": "string",
+          "default": "",
+          "description": "amazonアソシエイトAPIのアクセスキーIDを設定してください"
         }
-
       }
     },
     "commands": [
@@ -62,7 +76,13 @@
     "eslint": "^9.34.0"
   },
   "dependencies": {
+    "@aws-sdk/credential-provider-node": "^3.893.0",
+    "@aws-sdk/hash-node": "^3.370.0",
+    "@aws-sdk/signature-v4": "^3.370.0",
+    "@aws-sdk/url-parser-node": "^3.1.0",
+    "@aws-sdk/util-utf8-node": "^3.259.0",
     "axios": "^1.12.2",
+    "dotenv": "^17.2.2",
     "jsdom": "^27.0.0",
     "node-fetch": "^3.3.2",
     "request": "^2.88.2"

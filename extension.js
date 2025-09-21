@@ -24,12 +24,55 @@ function activate(context) {
 		const doc = activeEditor && activeEditor.document;
 		const ref = activeEditor?.selection;
 		const url = doc?.getText(ref);
-		getContent(url, activeEditor, ref);
+		try {
+    		if(URL.canParse(url)) {
+				    getContent(url, activeEditor, ref);
+				
+    		} else {
+    			
+    			getContentFromText(url);
+    		}
+	    } catch(error) {
+	    	console.log(error);
+	    }
 		
 
 	});
 
 	context.subscriptions.push(disposable);
+}
+
+function getContentFromText(body, activeEditor, ref) {
+	// 各要素を取得、ogを優先するが、なければ他を当たる
+	const {
+        JSDOM
+    } = require('jsdom')
+		const dom = new JSDOM(body);
+		const bcUrl = getUrl(dom, '');
+		const bcType = getType(dom);
+		const bcTitle = getTitle(dom);
+		const bcDescription = getDescription(dom);
+		const bcSiteName = getSiteName(dom, '');
+		const bcImage = getImage(dom);
+		var replaceStr = '';
+		const config = vscode.workspace.getConfiguration('blogcard');
+		
+		if(bcImage == null || bcImage =='') {
+			replaceStr = config.get('templateWithoutImage');
+		} else {
+			replaceStr = config.get('templateWithImage');
+		}
+
+		replaceStr = replaceStr.replaceAll("${bcUrl}", bcUrl);
+        replaceStr = replaceStr.replaceAll("${bcType}", bcType);
+        replaceStr = replaceStr.replaceAll("${bcTitle}", bcTitle);
+        replaceStr = replaceStr.replaceAll("${bcDescription}", bcDescription);
+        replaceStr = replaceStr.replaceAll("${bcSiteName}", bcSiteName);
+        replaceStr = replaceStr.replaceAll("${bcImage}", bcImage);
+
+        activeEditor.edit((edit) => {
+		      	edit.replace(ref, replaceStr);
+		});
 }
 
 function getContent(url, activeEditor, ref) {
