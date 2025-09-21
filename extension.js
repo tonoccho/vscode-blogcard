@@ -25,63 +25,111 @@ function activate(context) {
 		const ref = activeEditor?.selection;
 		const url = doc?.getText(ref);
 		try {
-    		if(URL.canParse(url)) {
-				    getContent(url, activeEditor, ref);
-				
-    		} else {
-    			
-    			getContentFromText(url);
-    		}
-	    } catch(error) {
-	    	console.log(error);
-	    }
-		
+			if (URL.canParse(url)) {
+				if (new URL(url).origin === 'www.amazon.co.jp') {
+					getContentFromAmazon(url, activeEditor, ref);
 
+				} else {
+					getContent(url, activeEditor, ref);
+				}
+			} else {
+
+				getContentFromText(url);
+			}
+		} catch (error) {
+			console.log(error);
+		}
 	});
 
 	context.subscriptions.push(disposable);
 }
 
-function getContentFromText(body, activeEditor, ref) {
-	// 各要素を取得、ogを優先するが、なければ他を当たる
-	const {
-        JSDOM
-    } = require('jsdom')
-		const dom = new JSDOM(body);
-		const bcUrl = getUrl(dom, '');
-		const bcType = getType(dom);
-		const bcTitle = getTitle(dom);
-		const bcDescription = getDescription(dom);
-		const bcSiteName = getSiteName(dom, '');
-		const bcImage = getImage(dom);
+function getContentFromAmazon(url, activeEditor, ref) {
+	const config = vscode.workspace.getConfiguration('blogcard');
+	const paapi5NodejsSdk = require('paapi5-nodejs-sdk');
+	const paapiClient = paapi5NodejsSdk.ApiClient.instance;
+	paapiClient.accessKey = config.get('amazonAccessKey');
+	paapiClient.secretKey = config.get('amazonSecretKey');
+	paapiClient.host = 'webservices.amazon.co.jp';
+	paapiClient.region = 'us-west-2';
+
+	const api = new paapi5NodejsSdk.DefaultApi();
+	const getItemRequest = new paapi5NodejsSdk.GetItemsRequest();
+
+	getItemRequest['PartnerTag'] = config.get('amazonTrackingID');
+	getItemRequest['PartnerType'] = 'Associates';
+	getItemRequest['ItemIds'] = ['B09MRYV3BC'];
+	getItemRequest['Resources'] = ['Images.Primary.Medium', 'ItemInfo.Title', 'ItemInfo.ByLineInfo'];
+
+	api.getItems(getItemRequest, function (error, data, response) {
+		const bcUrl = getUrl('URL', '');
+		const bcType = getType('Type');
+		const bcTitle = '[PR] ' + getTitle('Title');
+		const bcDescription = getDescription('Description');
+		const bcSiteName = getSiteName('Amazon', '');
+		const bcImage = getImage('');
 		var replaceStr = '';
 		const config = vscode.workspace.getConfiguration('blogcard');
-		
-		if(bcImage == null || bcImage =='') {
+
+		if (bcImage == null || bcImage == '') {
 			replaceStr = config.get('templateWithoutImage');
 		} else {
 			replaceStr = config.get('templateWithImage');
 		}
 
 		replaceStr = replaceStr.replaceAll("${bcUrl}", bcUrl);
-        replaceStr = replaceStr.replaceAll("${bcType}", bcType);
-        replaceStr = replaceStr.replaceAll("${bcTitle}", bcTitle);
-        replaceStr = replaceStr.replaceAll("${bcDescription}", bcDescription);
-        replaceStr = replaceStr.replaceAll("${bcSiteName}", bcSiteName);
-        replaceStr = replaceStr.replaceAll("${bcImage}", bcImage);
+		replaceStr = replaceStr.replaceAll("${bcType}", bcType);
+		replaceStr = replaceStr.replaceAll("${bcTitle}", bcTitle);
+		replaceStr = replaceStr.replaceAll("${bcDescription}", bcDescription);
+		replaceStr = replaceStr.replaceAll("${bcSiteName}", bcSiteName);
+		replaceStr = replaceStr.replaceAll("${bcImage}", bcImage);
 
-        activeEditor.edit((edit) => {
-		      	edit.replace(ref, replaceStr);
+		activeEditor.edit((edit) => {
+			edit.replace(ref, replaceStr);
 		});
+	});
+
+}
+function getContentFromText(body, activeEditor, ref) {
+	// 各要素を取得、ogを優先するが、なければ他を当たる
+	const {
+		JSDOM
+	} = require('jsdom')
+	const dom = new JSDOM(body);
+	const bcUrl = getUrl(dom, '');
+	const bcType = getType(dom);
+	const bcTitle = getTitle(dom);
+	const bcDescription = getDescription(dom);
+	const bcSiteName = getSiteName(dom, '');
+	const bcImage = getImage(dom);
+	var replaceStr = '';
+	const config = vscode.workspace.getConfiguration('blogcard');
+
+	if (bcImage == null || bcImage == '') {
+		replaceStr = config.get('templateWithoutImage');
+	} else {
+		replaceStr = config.get('templateWithImage');
+	}
+
+	replaceStr = replaceStr.replaceAll("${bcUrl}", bcUrl);
+	replaceStr = replaceStr.replaceAll("${bcType}", bcType);
+	replaceStr = replaceStr.replaceAll("${bcTitle}", bcTitle);
+	replaceStr = replaceStr.replaceAll("${bcDescription}", bcDescription);
+	replaceStr = replaceStr.replaceAll("${bcSiteName}", bcSiteName);
+	replaceStr = replaceStr.replaceAll("${bcImage}", bcImage);
+
+	activeEditor.edit((edit) => {
+		edit.replace(ref, replaceStr);
+	});
 }
 
 function getContent(url, activeEditor, ref) {
 	const request = require('request');
 	const {
-        JSDOM
-    } = require('jsdom')
+		JSDOM
+	} = require('jsdom')
 
-	request.get(url, function(err, res, body) {
+	request.get(url, function (err, res, body) {
 		// 各要素を取得、ogを優先するが、なければ他を当たる
 		const dom = new JSDOM(body);
 		const bcUrl = getUrl(dom, url);
@@ -92,22 +140,22 @@ function getContent(url, activeEditor, ref) {
 		const bcImage = getImage(dom);
 		var replaceStr = '';
 		const config = vscode.workspace.getConfiguration('blogcard');
-		
-		if(bcImage == null || bcImage =='') {
+
+		if (bcImage == null || bcImage == '') {
 			replaceStr = config.get('templateWithoutImage');
 		} else {
 			replaceStr = config.get('templateWithImage');
 		}
 
 		replaceStr = replaceStr.replaceAll("${bcUrl}", bcUrl);
-        replaceStr = replaceStr.replaceAll("${bcType}", bcType);
-        replaceStr = replaceStr.replaceAll("${bcTitle}", bcTitle);
-        replaceStr = replaceStr.replaceAll("${bcDescription}", bcDescription);
-        replaceStr = replaceStr.replaceAll("${bcSiteName}", bcSiteName);
-        replaceStr = replaceStr.replaceAll("${bcImage}", bcImage);
+		replaceStr = replaceStr.replaceAll("${bcType}", bcType);
+		replaceStr = replaceStr.replaceAll("${bcTitle}", bcTitle);
+		replaceStr = replaceStr.replaceAll("${bcDescription}", bcDescription);
+		replaceStr = replaceStr.replaceAll("${bcSiteName}", bcSiteName);
+		replaceStr = replaceStr.replaceAll("${bcImage}", bcImage);
 
-        activeEditor.edit((edit) => {
-		      	edit.replace(ref, replaceStr);
+		activeEditor.edit((edit) => {
+			edit.replace(ref, replaceStr);
 		});
 	});
 }
@@ -115,73 +163,73 @@ function getContent(url, activeEditor, ref) {
 function getImage(dom) {
 	var image = '';
 	image = getHTMLTagContent(dom, 'meta[property="og:image"]', '');
-	if(image == '') {
+	if (image == '') {
 		image = getHTMLTagContent(dom, 'meta[name="og:image"]', '');
 	}
-    return image;
+	return image;
 }
 
 function getSiteName(dom, originalUrl) {
 	var siteName = '';
 	siteName = getHTMLTagContent(dom, 'meta[property="og:site_name"]', '');
-	if(siteName == '') {
+	if (siteName == '') {
 		siteName = getHTMLTagContent(dom, 'meta[name="og:site_name"]', new URL(originalUrl).origin);
 	}
-    return siteName;
+	return siteName;
 }
 
 function getType(dom) {
 	var type = '';
 	type = getHTMLTagContent(dom, 'meta[property="og:type"]', '');
-	if(type == '') {
+	if (type == '') {
 		type = getHTMLTagContent(dom, 'meta[name="og:type"]', '');
-	} 
+	}
 	return type;
 }
 
 function getUrl(dom, originalUrl) {
 	var url = '';
 	url = getHTMLTagContent(dom, 'meta[property="og:url"]', '');
-	if(url == '') {
+	if (url == '') {
 		url = getHTMLTagContent(dom, 'meta[name="og:url"]', '');
 	}
 	// なかったら取得元のURLを使用する
-	if(url == '') {
-	    url = originalUrl;
-    }
-    return url;
+	if (url == '') {
+		url = originalUrl;
+	}
+	return url;
 }
 
 function getTitle(dom) {
 	var title = '';
 	title = getHTMLTagContent(dom, 'meta[property="og:title"]', '');
-	if(title == '') {
+	if (title == '') {
 		title = getHTMLTagContent(dom, 'meta[name="og:title"]', '');
-	}   
-	if(title == null || title == '') {
+	}
+	if (title == null || title == '') {
 		title = dom.window.document.title;
 	}
 	// ここまでやってだめだったら諦める
-    if(title == null || title == '') {
-	    title = "UNKNOWN TITLE";
-    }
+	if (title == null || title == '') {
+		title = "UNKNOWN TITLE";
+	}
 	return title;
 }
 
 function getDescription(dom) {
-   	var description = '';
+	var description = '';
 	description = getHTMLTagContent(dom, 'meta[property="og:description"]', '');
-	if(description == '') {
+	if (description == '') {
 		description = getHTMLTagContent(dom, 'meta[name="og:description"]', '');
 	}
-    return description;
+	return description;
 }
 
 function getHTMLTagContent(dom, query, defaultValue) {
 	var content = '';
-		// 間違っているサイト対応
-	if(dom.window.document.querySelector(query) != null) {
-        content = dom.window.document.querySelector(query).content;
+	// 間違っているサイト対応
+	if (dom.window.document.querySelector(query) != null) {
+		content = dom.window.document.querySelector(query).content;
 	} else {
 		content = defaultValue;
 	}
@@ -189,7 +237,7 @@ function getHTMLTagContent(dom, query, defaultValue) {
 }
 
 // This method is called when your extension is deactivated
-function deactivate() {}
+function deactivate() { }
 
 module.exports = {
 	activate,

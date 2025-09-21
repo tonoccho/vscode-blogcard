@@ -2,8 +2,10 @@
   "name": "vscode-blogcard",
   "displayName": "Blogcard Generator",
   "description": "This extension generates blog card from selected test (URL / Entire HTML) in editor screen.",
-  "repository": {"url": "https://github.com/tonoccho/vscode-blogcard.git"},
-  "license":"MIT",
+  "repository": {
+    "url": "https://github.com/tonoccho/vscode-blogcard.git"
+  },
+  "license": "MIT",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.104.0"
@@ -85,6 +87,7 @@
     "dotenv": "^17.2.2",
     "jsdom": "^27.0.0",
     "node-fetch": "^3.3.2",
+    "paapi5-nodejs-sdk": "^1.1.0",
     "request": "^2.88.2"
   }
 }
