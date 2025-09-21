@@ -26,7 +26,7 @@ function activate(context) {
 		const url = doc?.getText(ref);
 		try {
 			if (URL.canParse(url)) {
-				if (new URL(url).origin === 'www.amazon.co.jp') {
+				if (new URL(url).origin === 'https://www.amazon.co.jp') {
 					getContentFromAmazon(url, activeEditor, ref);
 
 				} else {
@@ -56,12 +56,20 @@ function getContentFromAmazon(url, activeEditor, ref) {
 	const api = new paapi5NodejsSdk.DefaultApi();
 	const getItemRequest = new paapi5NodejsSdk.GetItemsRequest();
 
+	const match = url.match('(.*dp\/)(.{10})(.*)');
+	const asin = match[2];
 	getItemRequest['PartnerTag'] = config.get('amazonTrackingID');
 	getItemRequest['PartnerType'] = 'Associates';
-	getItemRequest['ItemIds'] = ['B09MRYV3BC'];
+	getItemRequest['ItemIds'] = [asin];
 	getItemRequest['Resources'] = ['Images.Primary.Medium', 'ItemInfo.Title', 'ItemInfo.ByLineInfo'];
 
 	api.getItems(getItemRequest, function (error, data, response) {
+		if (error) {
+
+		} else {
+
+		}
+		/*
 		const bcUrl = getUrl('URL', '');
 		const bcType = getType('Type');
 		const bcTitle = '[PR] ' + getTitle('Title');
@@ -87,6 +95,7 @@ function getContentFromAmazon(url, activeEditor, ref) {
 		activeEditor.edit((edit) => {
 			edit.replace(ref, replaceStr);
 		});
+		*/
 	});
 
 }
