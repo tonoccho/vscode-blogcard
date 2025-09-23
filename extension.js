@@ -33,8 +33,7 @@ function activate(context) {
 					getContent(url, activeEditor, ref);
 				}
 			} else {
-
-				getContentFromText(url);
+				getContentFromText(url, activeEditor, ref);
 			}
 		} catch (error) {
 			console.log(error);
@@ -46,24 +45,41 @@ function activate(context) {
 
 function getContentFromAmazon(url, activeEditor, ref) {
 	const config = vscode.workspace.getConfiguration('blogcard');
-	const paapi5NodejsSdk = require('paapi5-nodejs-sdk');
-	const paapiClient = paapi5NodejsSdk.ApiClient.instance;
-	paapiClient.accessKey = config.get('amazonAccessKey');
-	paapiClient.secretKey = config.get('amazonSecretKey');
-	paapiClient.host = 'webservices.amazon.co.jp';
-	paapiClient.region = 'us-west-2';
+	const accessKey = config.get('amazonAccessKey');
+	const secretKey = config.get('amazonSecretKey');
+	const amazonTrackingID = config.get('amazonTrackingID');
 
-	const api = new paapi5NodejsSdk.DefaultApi();
-	const getItemRequest = new paapi5NodejsSdk.GetItemsRequest();
 
+	const ProductAdvertisingAPIv1 = require('paapi5-nodejs-sdk');
+	var defaultClient = ProductAdvertisingAPIv1.ApiClient.instance;
+	defaultClient.accessKey = accessKey;
+	defaultClient.secretKey = secretKey;
+	defaultClient.host = 'webservices.amazon.co.jp';
+	defaultClient.region = 'us-west-2';
 	const match = url.match('(.*dp\/)(.{10})(.*)');
 	const asin = match[2];
-	getItemRequest['PartnerTag'] = config.get('amazonTrackingID');
-	getItemRequest['PartnerType'] = 'Associates';
-	getItemRequest['ItemIds'] = [asin];
-	getItemRequest['Resources'] = ['Images.Primary.Medium', 'ItemInfo.Title', 'ItemInfo.ByLineInfo'];
-
-	api.getItems(getItemRequest, function (error, data, response) {
+	var api = new ProductAdvertisingAPIv1.DefaultApi();
+	var getItemsRequest = new ProductAdvertisingAPIv1.GetItemsRequest();
+	getItemsRequest['PartnerTag'] = amazonTrackingID;
+	getItemsRequest['PartnerType'] = 'Associates';
+	getItemsRequest['ItemIds'] = [asin];
+	getItemsRequest['Resources'] = [
+		"BrowseNodeInfo.BrowseNodes",
+		"BrowseNodeInfo.BrowseNodes.Ancestor",
+		"BrowseNodeInfo.BrowseNodes.SalesRank",
+		"BrowseNodeInfo.WebsiteSalesRank",
+		"Images.Primary.Small",
+		"Images.Primary.Medium",
+		"Images.Primary.Large",
+		"ItemInfo.ByLineInfo",
+		"ItemInfo.ContentRating",
+		"ItemInfo.Classifications",
+		"ItemInfo.ExternalIds",
+		"ItemInfo.ManufactureInfo",
+		"ItemInfo.ProductInfo",
+		"ItemInfo.Title",
+		"Offers.Listings.Price"];
+	api.getItems(getItemsRequest, function (error, data, response) {
 		if (error) {
 
 		} else {
@@ -182,7 +198,10 @@ function getSiteName(dom, originalUrl) {
 	var siteName = '';
 	siteName = getHTMLTagContent(dom, 'meta[property="og:site_name"]', '');
 	if (siteName == '') {
-		siteName = getHTMLTagContent(dom, 'meta[name="og:site_name"]', new URL(originalUrl).origin);
+		siteName = getHTMLTagContent(dom, 'meta[name="og:site_name"]', '');
+	}
+	if(siteName == '' && originalUrl != null && URL.canParse(originalUrl)) {
+		siteName = new URL(originalUrl).origin;
 	}
 	return siteName;
 }
