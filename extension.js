@@ -26,12 +26,7 @@ function activate(context) {
 		const url = doc?.getText(ref);
 		try {
 			if (URL.canParse(url)) {
-				if (new URL(url).origin === 'https://www.amazon.co.jp') {
-					getContentFromAmazon(url, activeEditor, ref);
-
-				} else {
 					getContent(url, activeEditor, ref);
-				}
 			} else {
 				getContentFromText(url, activeEditor, ref);
 			}
@@ -43,78 +38,6 @@ function activate(context) {
 	context.subscriptions.push(disposable);
 }
 
-function getContentFromAmazon(url, activeEditor, ref) {
-	const config = vscode.workspace.getConfiguration('blogcard');
-	const accessKey = config.get('amazonAccessKey');
-	const secretKey = config.get('amazonSecretKey');
-	const amazonTrackingID = config.get('amazonTrackingID');
-
-
-	const ProductAdvertisingAPIv1 = require('paapi5-nodejs-sdk');
-	var defaultClient = ProductAdvertisingAPIv1.ApiClient.instance;
-	defaultClient.accessKey = accessKey;
-	defaultClient.secretKey = secretKey;
-	defaultClient.host = 'webservices.amazon.co.jp';
-	defaultClient.region = 'us-west-2';
-	const match = url.match('(.*dp\/)(.{10})(.*)');
-	const asin = match[2];
-	var api = new ProductAdvertisingAPIv1.DefaultApi();
-	var getItemsRequest = new ProductAdvertisingAPIv1.GetItemsRequest();
-	getItemsRequest['PartnerTag'] = amazonTrackingID;
-	getItemsRequest['PartnerType'] = 'Associates';
-	getItemsRequest['ItemIds'] = [asin];
-	getItemsRequest['Resources'] = [
-		"BrowseNodeInfo.BrowseNodes",
-		"BrowseNodeInfo.BrowseNodes.Ancestor",
-		"BrowseNodeInfo.BrowseNodes.SalesRank",
-		"BrowseNodeInfo.WebsiteSalesRank",
-		"Images.Primary.Small",
-		"Images.Primary.Medium",
-		"Images.Primary.Large",
-		"ItemInfo.ByLineInfo",
-		"ItemInfo.ContentRating",
-		"ItemInfo.Classifications",
-		"ItemInfo.ExternalIds",
-		"ItemInfo.ManufactureInfo",
-		"ItemInfo.ProductInfo",
-		"ItemInfo.Title",
-		"Offers.Listings.Price"];
-	api.getItems(getItemsRequest, function (error, data, response) {
-		if (error) {
-
-		} else {
-
-		}
-		/*
-		const bcUrl = getUrl('URL', '');
-		const bcType = getType('Type');
-		const bcTitle = '[PR] ' + getTitle('Title');
-		const bcDescription = getDescription('Description');
-		const bcSiteName = getSiteName('Amazon', '');
-		const bcImage = getImage('');
-		var replaceStr = '';
-		const config = vscode.workspace.getConfiguration('blogcard');
-
-		if (bcImage == null || bcImage == '') {
-			replaceStr = config.get('templateWithoutImage');
-		} else {
-			replaceStr = config.get('templateWithImage');
-		}
-
-		replaceStr = replaceStr.replaceAll("${bcUrl}", bcUrl);
-		replaceStr = replaceStr.replaceAll("${bcType}", bcType);
-		replaceStr = replaceStr.replaceAll("${bcTitle}", bcTitle);
-		replaceStr = replaceStr.replaceAll("${bcDescription}", bcDescription);
-		replaceStr = replaceStr.replaceAll("${bcSiteName}", bcSiteName);
-		replaceStr = replaceStr.replaceAll("${bcImage}", bcImage);
-
-		activeEditor.edit((edit) => {
-			edit.replace(ref, replaceStr);
-		});
-		*/
-	});
-
-}
 function getContentFromText(body, activeEditor, ref) {
 	// 各要素を取得、ogを優先するが、なければ他を当たる
 	const {

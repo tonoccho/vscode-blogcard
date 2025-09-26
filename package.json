@@ -30,21 +30,6 @@
           "type": "string",
           "default": "<div class='blog-card'><h3><a href='${bcUrl}' target='_blank'>${bcTitle} | ${bcSiteName}</a><h3><p>${bcDescription}</p></div>",
           "description": "ブログカードのHTMLテンプレート（画像あり）を設定してください"
-        },
-        "blogcard.amazonAccessKey": {
-          "type": "string",
-          "default": "",
-          "description": "amazonアソシエイトAPIのアクセスキーを設定してください"
-        },
-        "blogcard.amazonSecretKey": {
-          "type": "string",
-          "default": "",
-          "description": "amazonアソシエイトAPIのシークレットキーを設定してください"
-        },
-        "blogcard.amazonTrackingID": {
-          "type": "string",
-          "default": "",
-          "description": "amazonアソシエイトAPIのアクセスキーIDを設定してください"
         }
       }
     },
