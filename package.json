@@ -35,16 +35,34 @@
     },
     "commands": [
       {
-        "command": "vscode.contextmenu.createBlogCard",
-        "title": "Create blog card from selected text"
+        "command": "vscode.contextmenu.createBlogCardFromURL",
+        "title": "Create blog card from URL"
+      },
+      {
+        "command": "vscode.contextmenu.createBlogCardFromHTMLSource",
+        "title": "Create blog card from HTML Source"
+      },
+      {
+        "command": "vscode.contextmenu.createBlogCardFromAmazonHTMLSource",
+        "title": "Create blog card from Amazon HTML Source"
       }
     ],
     "menus": {
       "editor/context": [
         {
           "when": "editorFocus",
-          "command": "vscode.contextmenu.createBlogCard",
-          "group": "myGroup@1"
+          "command": "vscode.contextmenu.createBlogCardFromURL",
+          "group": "blogCardGoup@1"
+        },
+        {
+          "when": "editorFocus",
+          "command": "vscode.contextmenu.createBlogCardFromHTMLSource",
+          "group": "blogCardGoup@2"
+        },
+        {
+          "when": "editorFocus",
+          "command": "vscode.contextmenu.createBlogCardFromAmazonHTMLSource",
+          "group": "blogCardGoup@3"
         }
       ]
     }
