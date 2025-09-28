@@ -11,7 +11,7 @@
     "vscode": "^1.104.0"
   },
   "categories": [
-    "Plugins"
+    "Snippets"
   ],
   "activationEvents": [
     "onStartupFinished"
@@ -23,12 +23,12 @@
       "properties": {
         "blogcard.templateWithoutImage": {
           "type": "string",
-          "default": "blogcard-template/without-image.md",
+          "default": "",
           "description": "ブログカードのHTMLテンプレート（画像無し）を設定してください"
         },
         "blogcard.templateWithImage": {
           "type": "string",
-          "default": "blogcard-template/with-image.md",
+          "default": "",
           "description": "ブログカードのHTMLテンプレート（画像あり）を設定してください"
         }
       }
