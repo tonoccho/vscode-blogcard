@@ -2,8 +2,10 @@
   "name": "vscode-blogcard",
   "displayName": "Blogcard Generator",
   "description": "This extension generates blog card from selected test (URL / Entire HTML) in editor screen.",
-  "repository": {"url": "https://github.com/tonoccho/vscode-blogcard.git"},
-  "license":"MIT",
+  "repository": {
+    "url": "https://github.com/tonoccho/vscode-blogcard.git"
+  },
+  "license": "MIT",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.104.0"
@@ -18,7 +20,7 @@
   "contributes": {
     "configuration": {
       "title": "%title%",
-      "properties": {        
+      "properties": {
         "blogcard.templateWithoutImage": {
           "type": "string",
           "default": "<div class='blog-card'><h3><a href='${bcUrl}' target='_blank'>${bcTitle} | ${bcSiteName}</a><h3><p>${bcDescription}</p></div>",
@@ -29,21 +31,38 @@
           "default": "<div class='blog-card'><h3><a href='${bcUrl}' target='_blank'>${bcTitle} | ${bcSiteName}</a><h3><p>${bcDescription}</p></div>",
           "description": "ブログカードのHTMLテンプレート（画像あり）を設定してください"
         }
-
       }
     },
     "commands": [
       {
-        "command": "vscode.contextmenu.createBlogCard",
-        "title": "Create blog card from selected text"
+        "command": "vscode.contextmenu.createBlogCardFromURL",
+        "title": "Create blog card from URL"
+      },
+      {
+        "command": "vscode.contextmenu.createBlogCardFromHTMLSource",
+        "title": "Create blog card from HTML Source"
+      },
+      {
+        "command": "vscode.contextmenu.createBlogCardFromAmazonHTMLSource",
+        "title": "Create blog card from Amazon HTML Source"
       }
     ],
     "menus": {
       "editor/context": [
         {
           "when": "editorFocus",
-          "command": "vscode.contextmenu.createBlogCard",
-          "group": "myGroup@1"
+          "command": "vscode.contextmenu.createBlogCardFromURL",
+          "group": "blogCardGoup@1"
+        },
+        {
+          "when": "editorFocus",
+          "command": "vscode.contextmenu.createBlogCardFromHTMLSource",
+          "group": "blogCardGoup@2"
+        },
+        {
+          "when": "editorFocus",
+          "command": "vscode.contextmenu.createBlogCardFromAmazonHTMLSource",
+          "group": "blogCardGoup@3"
         }
       ]
     }
@@ -62,9 +81,16 @@
     "eslint": "^9.34.0"
   },
   "dependencies": {
+    "@aws-sdk/credential-provider-node": "^3.893.0",
+    "@aws-sdk/hash-node": "^3.370.0",
+    "@aws-sdk/signature-v4": "^3.370.0",
+    "@aws-sdk/url-parser-node": "^3.1.0",
+    "@aws-sdk/util-utf8-node": "^3.259.0",
     "axios": "^1.12.2",
+    "dotenv": "^17.2.2",
     "jsdom": "^27.0.0",
     "node-fetch": "^3.3.2",
+    "paapi5-nodejs-sdk": "^1.1.0",
     "request": "^2.88.2"
   }
 }

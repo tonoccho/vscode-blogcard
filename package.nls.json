@@ -1,5 +1,5 @@
 {
-    "title": "Blogcard Generator",
-    "description":"Generate blog card HTML with the selected URL",
-    "titleCreateBlogCard":"Generate blog card from selected text"
+    "title": "ブログカードジェネレータ",
+    "description":"選択箇所の文字列を利用してブログカードを生成します。",
+    "titleCreateBlogCard":"選択箇所からブログカードを生成"
 }
