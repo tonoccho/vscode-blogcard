@@ -73,6 +73,30 @@ function activate(context) {
 	context.subscriptions.push(createBlogCardFromAmazonHTMLSource);
 }
 
+function finalizeTemplate(activeEditor, ref, bcUrl, bcType, bcTitle, bcDescription, bcSiteName, bcImage) {
+	const config = vscode.workspace.getConfiguration('blogcard');
+	var replaceStr = '';
+	if (bcImage == null || bcImage == '') {
+		replaceStr = config.get('templateWithoutImage');
+	} else {
+		replaceStr = config.get('templateWithImage');
+	}
+	const fs = require('fs');
+	fs.readFile(replaceStr, (err, data) => {
+		var replaceStr = String.fromCharCode.apply(null, new Uint16Array(data));
+		replaceStr = replaceStr.replaceAll("${bcUrl}", bcUrl);
+		replaceStr = replaceStr.replaceAll("${bcType}", bcType);
+		replaceStr = replaceStr.replaceAll("${bcTitle}", bcTitle);
+		replaceStr = replaceStr.replaceAll("${bcDescription}", bcDescription);
+		replaceStr = replaceStr.replaceAll("${bcSiteName}", bcSiteName);
+		replaceStr = replaceStr.replaceAll("${bcImage}", bcImage);
+
+		activeEditor.edit((edit) => {
+			edit.replace(ref, replaceStr);
+		});
+	});
+
+}
 async function getContentFromAmazonProductPageSource(body, activeEditor, ref) {
 	// 各要素を取得、ogを優先するが、なければ他を当たる
 	const url = await vscode.window.showInputBox({
@@ -95,25 +119,7 @@ async function getContentFromAmazonProductPageSource(body, activeEditor, ref) {
 			const bcDescription = getHTMLTagContent(dom, 'meta[name="description"]', '');;
 			const bcSiteName = origin;
 			const bcImage = dom.window.document.querySelector("img[id=landingImage]").getAttribute('src');
-			var replaceStr = '';
-			const config = vscode.workspace.getConfiguration('blogcard');
-
-			if (bcImage == null || bcImage == '') {
-				replaceStr = config.get('templateWithoutImage');
-			} else {
-				replaceStr = config.get('templateWithImage');
-			}
-
-			replaceStr = replaceStr.replaceAll("${bcUrl}", bcUrl);
-			replaceStr = replaceStr.replaceAll("${bcType}", bcType);
-			replaceStr = replaceStr.replaceAll("${bcTitle}", bcTitle);
-			replaceStr = replaceStr.replaceAll("${bcDescription}", bcDescription);
-			replaceStr = replaceStr.replaceAll("${bcSiteName}", bcSiteName);
-			replaceStr = replaceStr.replaceAll("${bcImage}", bcImage);
-
-			activeEditor.edit((edit) => {
-				edit.replace(ref, replaceStr);
-			});
+			finalizeTemplate(activeEditor, ref, bcUrl, bcType, bcTitle, bcDescription, bcSiteName, bcImage);
 		}
 	}
 }
@@ -140,25 +146,7 @@ async function getContentFromText(body, activeEditor, ref) {
 			const bcDescription = getDescription(dom);
 			const bcSiteName = getSiteName(dom, '');
 			const bcImage = getImage(dom);
-			var replaceStr = '';
-			const config = vscode.workspace.getConfiguration('blogcard');
-
-			if (bcImage == null || bcImage == '') {
-				replaceStr = config.get('templateWithoutImage');
-			} else {
-				replaceStr = config.get('templateWithImage');
-			}
-
-			replaceStr = replaceStr.replaceAll("${bcUrl}", bcUrl);
-			replaceStr = replaceStr.replaceAll("${bcType}", bcType);
-			replaceStr = replaceStr.replaceAll("${bcTitle}", bcTitle);
-			replaceStr = replaceStr.replaceAll("${bcDescription}", bcDescription);
-			replaceStr = replaceStr.replaceAll("${bcSiteName}", bcSiteName);
-			replaceStr = replaceStr.replaceAll("${bcImage}", bcImage);
-
-			activeEditor.edit((edit) => {
-				edit.replace(ref, replaceStr);
-			});
+			finalizeTemplate(activeEditor, ref, bcUrl, bcType, bcTitle, bcDescription, bcSiteName, bcImage);
 		}
 	}
 }
@@ -178,25 +166,7 @@ function getContent(url, activeEditor, ref) {
 		const bcDescription = getDescription(dom);
 		const bcSiteName = getSiteName(dom, url);
 		const bcImage = getImage(dom);
-		var replaceStr = '';
-		const config = vscode.workspace.getConfiguration('blogcard');
-
-		if (bcImage == null || bcImage == '') {
-			replaceStr = config.get('templateWithoutImage');
-		} else {
-			replaceStr = config.get('templateWithImage');
-		}
-
-		replaceStr = replaceStr.replaceAll("${bcUrl}", bcUrl);
-		replaceStr = replaceStr.replaceAll("${bcType}", bcType);
-		replaceStr = replaceStr.replaceAll("${bcTitle}", bcTitle);
-		replaceStr = replaceStr.replaceAll("${bcDescription}", bcDescription);
-		replaceStr = replaceStr.replaceAll("${bcSiteName}", bcSiteName);
-		replaceStr = replaceStr.replaceAll("${bcImage}", bcImage);
-
-		activeEditor.edit((edit) => {
-			edit.replace(ref, replaceStr);
-		});
+		finalizeTemplate(activeEditor, ref, bcUrl, bcType, bcTitle, bcDescription, bcSiteName, bcImage);
 	});
 }
 

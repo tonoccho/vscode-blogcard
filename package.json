@@ -11,7 +11,7 @@
     "vscode": "^1.104.0"
   },
   "categories": [
-    "Plugins"
+    "Snippets"
   ],
   "activationEvents": [
     "onStartupFinished"
@@ -23,12 +23,12 @@
       "properties": {
         "blogcard.templateWithoutImage": {
           "type": "string",
-          "default": "<div class='blog-card'><h3><a href='${bcUrl}' target='_blank'>${bcTitle} | ${bcSiteName}</a><h3><p>${bcDescription}</p></div>",
+          "default": "",
           "description": "ブログカードのHTMLテンプレート（画像無し）を設定してください"
         },
         "blogcard.templateWithImage": {
           "type": "string",
-          "default": "<div class='blog-card'><h3><a href='${bcUrl}' target='_blank'>${bcTitle} | ${bcSiteName}</a><h3><p>${bcDescription}</p></div>",
+          "default": "",
           "description": "ブログカードのHTMLテンプレート（画像あり）を設定してください"
         }
       }
