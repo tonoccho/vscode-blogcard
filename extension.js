@@ -90,11 +90,11 @@ async function getContentFromAmazonProductPageSource(body, activeEditor, ref) {
 			} = require('jsdom')
 			const dom = new JSDOM(body);
 			const bcUrl = url;
-			const bcType = getType(dom);
-			const bcTitle = '[PR] ' + getTitle(dom);
-			const bcDescription = getDescription(dom);
-			const bcSiteName = 'Amazon';
-			const bcImage = getImage(dom);
+			const bcType = 'Asvertisement';
+			const bcTitle = '[PR] ' + getHTMLTagContent(dom, 'meta[name="title"]', '');
+			const bcDescription = getHTMLTagContent(dom, 'meta[name="description"]', '');;
+			const bcSiteName = origin;
+			const bcImage = dom.window.document.querySelector("img[id=landingImage]").getAttribute('src');
 			var replaceStr = '';
 			const config = vscode.workspace.getConfiguration('blogcard');
 
